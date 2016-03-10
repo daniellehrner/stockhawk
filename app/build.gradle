@@ -11,6 +11,8 @@ android {
     targetSdkVersion 23
     versionCode 1
     versionName "1.0"
+
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
   }
   buildTypes {
     release {
@@ -43,4 +45,11 @@ dependencies {
   apt 'com.google.dagger:dagger-compiler:2.0'
   compile 'com.google.dagger:dagger:2.0'
   provided 'javax.annotation:jsr250-api:1.0'
+
+  // instrumentation test
+  androidTestCompile 'com.android.support.test:runner:0.2'
+  androidTestCompile 'com.android.support.test:rules:0.2'
+  androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+  // Force usage of support annotations in the test app, since it is internally used by the runner module.
+  androidTestCompile 'com.android.support:support-annotations:23.1.1'
 }
