@@ -77,7 +77,18 @@ public class Utils {
       change = change.substring(0, change.length() - 1);
     }
     change = change.substring(1, change.length());
-    double round = (double) Math.round(Double.parseDouble(change) * 100) / 100;
+
+    Double changeDouble;
+
+    try {
+      changeDouble = Double.parseDouble(change);
+    }
+    catch (NumberFormatException e) {
+      Log.e(LOG_TAG, "Can't parse change: " + e.toString());
+      return "0.00";
+    }
+
+    double round = (double) Math.round(changeDouble * 100) / 100;
     change = String.format("%.2f", round);
     StringBuilder changeBuilder = new StringBuilder(change);
     changeBuilder.insert(0, weight);
@@ -92,13 +103,14 @@ public class Utils {
         QuoteProvider.Quotes.CONTENT_URI);
     try {
       String change = jsonObject.getString("Change");
+      String bid = jsonObject.getString("Bid");
 
-      if (change.equals("null")) {
+      if (bid.equals("null")) {
         return null;
       }
 
       builder.withValue(QuoteColumns.SYMBOL, jsonObject.getString("symbol"));
-      builder.withValue(QuoteColumns.BIDPRICE, truncateBidPrice(jsonObject.getString("Bid")));
+      builder.withValue(QuoteColumns.BIDPRICE, truncateBidPrice(bid));
       builder.withValue(QuoteColumns.PERCENT_CHANGE, truncateChange(
           jsonObject.getString("ChangeinPercent"), true));
       builder.withValue(QuoteColumns.CHANGE, truncateChange(change, false));

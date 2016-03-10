@@ -100,6 +100,10 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                 mCursor.moveToPosition(position);   // move to correct row in database
                 String symbol = mCursor.getString(mCursor.getColumnIndex("symbol"));
                 Log.d("MainActivity", "Clicked on " + symbol);
+
+                Intent intent = new Intent(mContext, LineGraphActivity.class);
+                intent.putExtra(LineGraphActivity.KEY_SYM, symbol);
+                startActivity(intent);
               }
             }));
     recyclerView.setAdapter(mCursorAdapter);

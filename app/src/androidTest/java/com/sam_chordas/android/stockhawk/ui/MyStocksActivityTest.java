@@ -5,6 +5,7 @@ import android.support.test.rule.ActivityTestRule;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.customMatcher.ToastMatcher;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,5 +53,12 @@ public class MyStocksActivityTest {
 
         onView(withText(R.string.symbol_not_found)).inRoot(new ToastMatcher())
                 .check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void shouldShowLineGraphActivity() {
+        onView(withText("YHOO")).perform(click());
+
+        onView(withClassName(endsWith("LineChartView"))).check(matches(isDisplayed()));
     }
 }
