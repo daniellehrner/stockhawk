@@ -1,5 +1,6 @@
 package com.sam_chordas.android.stockhawk.service;
 
+import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
@@ -10,15 +11,22 @@ import android.util.Log;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
+import com.sam_chordas.android.stockhawk.StockHawkApplication;
+import com.sam_chordas.android.stockhawk.busEvents.SymbolEvent;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
 import com.sam_chordas.android.stockhawk.rest.Utils;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.squareup.otto.Bus;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+
+import javax.inject.Inject;
 
 /**
  * Created by sam_chordas on 9/30/15.
@@ -33,10 +41,13 @@ public class StockTaskService extends GcmTaskService{
   private StringBuilder mStoredSymbols = new StringBuilder();
   private boolean isUpdate;
 
+  @Inject Bus mBus;
+
   public StockTaskService(){}
 
   public StockTaskService(Context context){
     mContext = context;
+      StockHawkApplication.getComponent().inject(this);
   }
   String fetchData(String url) throws IOException{
     Request request = new Request.Builder()
@@ -67,7 +78,7 @@ public class StockTaskService extends GcmTaskService{
       initQueryCursor = mContext.getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI,
           new String[] { "Distinct " + QuoteColumns.SYMBOL }, null,
           null, null);
-      if (initQueryCursor.getCount() == 0 || initQueryCursor == null){
+      if (initQueryCursor == null || initQueryCursor.getCount() == 0){
         // Init task. Populates DB with quotes for the symbols seen below
         try {
           urlStringBuilder.append(
@@ -75,12 +86,14 @@ public class StockTaskService extends GcmTaskService{
         } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
         }
-      } else if (initQueryCursor != null){
+      } else {
         DatabaseUtils.dumpCursor(initQueryCursor);
         initQueryCursor.moveToFirst();
         for (int i = 0; i < initQueryCursor.getCount(); i++){
-          mStoredSymbols.append("\""+
-              initQueryCursor.getString(initQueryCursor.getColumnIndex("symbol"))+"\",");
+          mStoredSymbols.append("\"");
+          mStoredSymbols.append(initQueryCursor.getString(initQueryCursor.getColumnIndex("symbol")));
+          mStoredSymbols.append("\",");
+
           initQueryCursor.moveToNext();
         }
         mStoredSymbols.replace(mStoredSymbols.length() - 1, mStoredSymbols.length(), ")");
@@ -108,8 +121,9 @@ public class StockTaskService extends GcmTaskService{
     String getResponse;
     int result = GcmNetworkManager.RESULT_FAILURE;
 
-    if (urlStringBuilder != null){
+    if (urlStringBuilder.length() > 0){
       urlString = urlStringBuilder.toString();
+      Log.d("StockTaskService", "URL: " + urlString);
       try{
         getResponse = fetchData(urlString);
         result = GcmNetworkManager.RESULT_SUCCESS;
@@ -121,8 +135,15 @@ public class StockTaskService extends GcmTaskService{
             mContext.getContentResolver().update(QuoteProvider.Quotes.CONTENT_URI, contentValues,
                 null, null);
           }
-          mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
-              Utils.quoteJsonToContentVals(getResponse));
+
+          ArrayList<ContentProviderOperation> results = Utils.quoteJsonToContentVals(getResponse);
+          if (!results.isEmpty()) {
+            mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY, results);
+          }
+          else {
+              Log.i(LOG_TAG, "Symbol not found");
+              mBus.post(new SymbolEvent(SymbolEvent.STATE.FAILURE));
+          }
         }catch (RemoteException | OperationApplicationException e){
           Log.e(LOG_TAG, "Error applying batch insert", e);
         }

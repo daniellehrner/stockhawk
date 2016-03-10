@@ -15,6 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +23,8 @@ import android.view.View;
 import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.sam_chordas.android.stockhawk.R;
+import com.sam_chordas.android.stockhawk.StockHawkApplication;
+import com.sam_chordas.android.stockhawk.busEvents.SymbolEvent;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
 import com.sam_chordas.android.stockhawk.rest.QuoteCursorAdapter;
@@ -34,6 +37,10 @@ import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 import com.melnykov.fab.FloatingActionButton;
 import com.sam_chordas.android.stockhawk.touch_helper.SimpleItemTouchHelperCallback;
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
+
+import javax.inject.Inject;
 
 public class MyStocksActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
@@ -46,16 +53,21 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
    */
   private CharSequence mTitle;
   private Intent mServiceIntent;
+  @SuppressWarnings("FieldCanBeLocal")
   private ItemTouchHelper mItemTouchHelper;
   private static final int CURSOR_LOADER_ID = 0;
   private QuoteCursorAdapter mCursorAdapter;
   private Context mContext;
   private Cursor mCursor;
   boolean isConnected;
+  @Inject Bus mBus;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
+    StockHawkApplication.getComponent().inject(this);
+
     mContext = this;
     ConnectivityManager cm =
         (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -85,7 +97,9 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
             new RecyclerViewItemClickListener.OnItemClickListener() {
               @Override public void onItemClick(View v, int position) {
                 //TODO:
-                // do something on item click
+                mCursor.moveToPosition(position);   // move to correct row in database
+                String symbol = mCursor.getString(mCursor.getColumnIndex("symbol"));
+                Log.d("MainActivity", "Clicked on " + symbol);
               }
             }));
     recyclerView.setAdapter(mCursorAdapter);
@@ -106,13 +120,13 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                   Cursor c = getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI,
                       new String[] { QuoteColumns.SYMBOL }, QuoteColumns.SYMBOL + "= ?",
                       new String[] { input.toString() }, null);
-                  if (c.getCount() != 0) {
+                  if (c != null && c.getCount() != 0) {
                     Toast toast =
                         Toast.makeText(MyStocksActivity.this, "This stock is already saved!",
                             Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.CENTER, Gravity.CENTER, 0);
                     toast.show();
-                    return;
+                    c.close();
                   } else {
                     // Add the stock to DB
                     mServiceIntent.putExtra("tag", "add");
@@ -160,6 +174,13 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   public void onResume() {
     super.onResume();
     getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
+    mBus.register(this);
+  }
+
+  @Override
+  public void onPause() {
+    super.onPause();
+    mBus.unregister(this);
   }
 
   public void networkToast(){
@@ -168,9 +189,11 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
   public void restoreActionBar() {
     ActionBar actionBar = getSupportActionBar();
-    actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-    actionBar.setDisplayShowTitleEnabled(true);
-    actionBar.setTitle(mTitle);
+    if (actionBar != null) {
+      actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+      actionBar.setDisplayShowTitleEnabled(true);
+      actionBar.setTitle(mTitle);
+    }
   }
 
   @Override
@@ -178,6 +201,21 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
       getMenuInflater().inflate(R.menu.my_stocks, menu);
       restoreActionBar();
       return true;
+  }
+
+  @Subscribe
+  public void onSymbolEvent(SymbolEvent e) {
+    if (e.state == SymbolEvent.STATE.FAILURE) {
+      Log.i("MainActivity", "Symbol not found");
+
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          Toast.makeText(mContext, getString(R.string.symbol_not_found), Toast.LENGTH_LONG).show();
+        }
+      });
+
+    }
   }
 
   @Override
