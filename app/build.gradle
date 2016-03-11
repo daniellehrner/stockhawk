@@ -34,7 +34,7 @@ dependencies {
   compile 'net.simonvt.schematic:schematic:0.6.3'
   compile 'com.melnykov:floatingactionbutton:1.2.0'
   //noinspection GradleDependency
-  compile 'com.android.support:design:23.1.1'
+  compile 'com.android.support:design:23.2.1'
   compile('com.afollestad.material-dialogs:core:0.8.4.2@aar') {
     transitive = true
   }
@@ -46,8 +46,15 @@ dependencies {
   compile 'com.google.dagger:dagger:2.0'
   provided 'javax.annotation:jsr250-api:1.0'
 
+  // view injection
+  compile 'com.jakewharton:butterknife:7.0.1'
+
   // LineChartView
   compile 'com.diogobernardino:williamchart:2.2'
+
+  // RxAndroid
+  compile 'io.reactivex:rxandroid:1.1.0'
+  compile 'io.reactivex:rxjava:1.1.0'
 
   // instrumentation test
   androidTestCompile 'com.android.support.test:runner:0.2'
@@ -55,5 +62,5 @@ dependencies {
   androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
   // Force usage of support annotations in the test app, since it is internally used by the runner module.
   //noinspection GradleDependency
-  androidTestCompile 'com.android.support:support-annotations:23.1.1'
+  androidTestCompile 'com.android.support:support-annotations:23.2.1'
 }
