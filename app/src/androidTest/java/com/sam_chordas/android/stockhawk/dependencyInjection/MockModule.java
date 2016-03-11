@@ -1,18 +1,18 @@
 package com.sam_chordas.android.stockhawk.dependencyInjection;
 
 import com.sam_chordas.android.stockhawk.rest.HistoricalDataClient;
-import com.sam_chordas.android.stockhawk.rest.HistoricalDataClientImpl;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
+
+import org.mockito.Mockito;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 
-@SuppressWarnings("unused")
 @Module
-public class ApplicationModule {
+public class MockModule {
     @Provides
     @Singleton
     public Bus provideBus() {
@@ -22,6 +22,6 @@ public class ApplicationModule {
     @Provides
     @Singleton
     public HistoricalDataClient provideHistoricalDataClient() {
-        return new HistoricalDataClientImpl();
+        return Mockito.mock(HistoricalDataClient.class);
     }
 }

@@ -66,7 +66,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    StockHawkApplication.getComponent().inject(this);
+    ((StockHawkApplication) getApplication()).getComponent().inject(this);
 
     mContext = this;
     ConnectivityManager cm =

@@ -47,7 +47,7 @@ public class StockTaskService extends GcmTaskService{
 
   public StockTaskService(Context context){
     mContext = context;
-      StockHawkApplication.getComponent().inject(this);
+    ((StockHawkApplication) mContext.getApplicationContext()).getComponent().inject(this);
   }
   String fetchData(String url) throws IOException{
     Request request = new Request.Builder()

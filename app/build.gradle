@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'android-apt'
+apply plugin: 'com.neenbedankt.android-apt'
 
 android {
   compileSdkVersion 23
@@ -12,7 +12,7 @@ android {
     versionCode 1
     versionName "1.0"
 
-    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    testInstrumentationRunner "com.sam_chordas.android.stockhawk.MockTestRunner"
   }
   buildTypes {
     release {
@@ -42,8 +42,8 @@ dependencies {
   compile 'com.squareup:otto:1.3.8'
 
   // dependency injection
-  apt 'com.google.dagger:dagger-compiler:2.0'
-  compile 'com.google.dagger:dagger:2.0'
+  apt 'com.google.dagger:dagger-compiler:2.0.2'
+  compile 'com.google.dagger:dagger:2.0.2'
   provided 'javax.annotation:jsr250-api:1.0'
 
   // view injection
@@ -59,8 +59,13 @@ dependencies {
   // instrumentation test
   androidTestCompile 'com.android.support.test:runner:0.2'
   androidTestCompile 'com.android.support.test:rules:0.2'
+  androidTestCompile 'org.mockito:mockito-core:1.10.19'
+  androidTestCompile "com.google.dexmaker:dexmaker:1.2"
+  androidTestCompile "com.google.dexmaker:dexmaker-mockito:1.2"
   androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
   // Force usage of support annotations in the test app, since it is internally used by the runner module.
   //noinspection GradleDependency
   androidTestCompile 'com.android.support:support-annotations:23.2.1'
+  androidTestApt 'com.google.dagger:dagger-compiler:2.0.2'
+  androidTestProvided 'javax.annotation:jsr250-api:1.0'
 }

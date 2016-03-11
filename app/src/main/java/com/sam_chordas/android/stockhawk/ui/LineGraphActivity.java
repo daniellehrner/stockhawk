@@ -12,10 +12,7 @@ import com.db.chart.Tools;
 import com.db.chart.model.LineSet;
 import com.db.chart.view.LineChartView;
 import com.db.chart.view.animation.Animation;
-import com.db.chart.view.animation.easing.BounceEase;
 import com.db.chart.view.animation.easing.CubicEase;
-import com.db.chart.view.animation.easing.LinearEase;
-import com.db.chart.view.animation.easing.SineEase;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.StockHawkApplication;
 import com.sam_chordas.android.stockhawk.rest.HistoricalDataClient;
@@ -28,19 +25,20 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.Observable;
 import rx.Observer;
-import rx.Scheduler;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class LineGraphActivity extends AppCompatActivity {
     public static String KEY_SYM = "LineGraphActivity.KEY_SYM";
+    private final String LOG_TAG = this.getClass().getSimpleName();
 
     @Bind(R.id.loader) ProgressBar mProgressBar;
     @Bind(R.id.linechart) LineChartView mLineChartView;
 
     private Subscription mLineChartSubscription;
-    @Inject HistoricalDataClient mRestClient;
+    @Inject
+    HistoricalDataClient mRestClient;
     private int mDurationInDays = 7;
 
     @Override
@@ -49,7 +47,7 @@ public class LineGraphActivity extends AppCompatActivity {
         setContentView(R.layout.activity_line_graph);
         ButterKnife.bind(this);
 
-        StockHawkApplication.getComponent().inject(this);
+        ((StockHawkApplication)getApplication()).getComponent().inject(this);
 
         mLineChartView.setAxisColor(Color.WHITE)
                 .setLabelsColor(Color.WHITE);
@@ -93,7 +91,7 @@ public class LineGraphActivity extends AppCompatActivity {
     }
 
     private void updateGraph(LineSet data) {
-        mProgressBar.setVisibility(View.GONE);
+
 
         data.setColor(Color.YELLOW)
                 .setDotsRadius(Tools.fromDpToPx(4))
@@ -108,8 +106,28 @@ public class LineGraphActivity extends AppCompatActivity {
         Animation anim = new Animation()
                 .setEasing(new CubicEase());
 
-        mLineChartView.show(anim);
+        StringBuilder descriptionBuilder = new StringBuilder();
+
+        Log.d(LOG_TAG, "data size: " + data.size());
+
+        for (int i = 0; i < data.size(); ++i) {
+            descriptionBuilder.append(data.getLabel(i))
+                    .append(": ")
+                    .append(data.getValue(i));
+
+            // add coma for all, but the last entry
+            if (i < data.size() - 1) {
+                descriptionBuilder.append(", ");
+            }
+        }
+
+        Log.d(LOG_TAG, "description: " + descriptionBuilder.toString());
+        mLineChartView.setContentDescription(descriptionBuilder.toString());
+
+        mProgressBar.setVisibility(View.GONE);
         mLineChartView.setVisibility(View.VISIBLE);
+
+        mLineChartView.show(anim);
     }
 
     @Override
