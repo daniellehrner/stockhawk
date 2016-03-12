@@ -1,6 +1,7 @@
 package com.sam_chordas.android.stockhawk.dependencyInjection;
 
 import com.sam_chordas.android.stockhawk.rest.HistoricalDataClient;
+import com.squareup.okhttp.OkHttpClient;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
@@ -23,5 +24,10 @@ public class MockModule {
     @Singleton
     public HistoricalDataClient provideHistoricalDataClient() {
         return Mockito.mock(HistoricalDataClient.class);
+    }
+
+    @Provides
+    public OkHttpClient providesClient() {
+        return new OkHttpClient();
     }
 }

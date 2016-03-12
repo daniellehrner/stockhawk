@@ -1,6 +1,5 @@
 package com.sam_chordas.android.stockhawk;
 
-import com.sam_chordas.android.stockhawk.dependencyInjection.AndroidModule;
 import com.sam_chordas.android.stockhawk.dependencyInjection.BasicComponent;
 import com.sam_chordas.android.stockhawk.dependencyInjection.DaggerTestingComponent;
 import com.sam_chordas.android.stockhawk.dependencyInjection.MockModule;

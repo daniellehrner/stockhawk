@@ -22,7 +22,7 @@ public class StockHawkApplication extends Application {
     public BasicComponent createComponent() {
         return DaggerApplicationComponent.builder()
                 .androidModule(new AndroidModule(this))
-                .applicationModule(new ApplicationModule())
+                .applicationModule(new ApplicationModule(this))
                 .build();
     }
 

@@ -13,7 +13,6 @@ import com.sam_chordas.android.stockhawk.customMatcher.ToastMatcher;
 import com.sam_chordas.android.stockhawk.dependencyInjection.TestingComponent;
 import com.sam_chordas.android.stockhawk.rest.HistoricalDataClient;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -63,21 +62,6 @@ public class MyStocksActivityTest {
         onView(withText(R.string.symbol_search)).check(matches(isDisplayed()));
         onView(withText(R.string.content_test)).check(matches(isDisplayed()));
         onView(allOf(withClassName(endsWith("EditText")), withHint(R.string.input_hint)))
-                .check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void shouldShowSymbolNotFoundToast() {
-        mActivityRule.launchActivity(new Intent());
-
-        onView(withId(R.id.fab)).perform(click());
-
-        onView(allOf(withClassName(endsWith("EditText")), withHint(R.string.input_hint)))
-                .perform(typeText("Test"));
-
-        onView(withText("OK")).perform(click());
-
-        onView(withText(R.string.symbol_not_found)).inRoot(new ToastMatcher())
                 .check(matches(isDisplayed()));
     }
 

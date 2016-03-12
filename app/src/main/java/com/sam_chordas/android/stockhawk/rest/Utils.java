@@ -5,7 +5,12 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -100,7 +105,7 @@ public class Utils {
   @Nullable
   public static ContentProviderOperation buildBatchOperation(JSONObject jsonObject){
     ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
-        QuoteProvider.Quotes.CONTENT_URI);
+            QuoteProvider.Quotes.CONTENT_URI);
     try {
       String change = jsonObject.getString("Change");
       String bid = jsonObject.getString("Bid");
@@ -125,5 +130,27 @@ public class Utils {
       e.printStackTrace();
     }
     return builder.build();
+  }
+
+  public static String getCalculatedDate(String dateFormat, int days) {
+    Calendar cal = Calendar.getInstance();
+    SimpleDateFormat s = new SimpleDateFormat(dateFormat);
+    cal.add(Calendar.DAY_OF_YEAR, days);
+    return s.format(new Date(cal.getTimeInMillis()));
+  }
+
+  public static int roundToNextTen(int v, boolean directionUp) {
+    int x;
+
+    if (directionUp) {
+      x = 10 - (v % 10);
+      v += x;
+    }
+    else {
+      x = (v % 10);
+      v -= x;
+    }
+
+    return v;
   }
 }

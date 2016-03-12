@@ -11,6 +11,9 @@
   <string name="network_toast">Uh-oh! This app requires an internet connection</string>
   <string name="symbol_not_found">Symbol could not be found</string>
   <string name="add_stock">Add new stock symbol</string>
-    <string name="title_activity_line_graph">Overview</string>
-    <string name="title_activity_main">MainActivity</string>
+  <string name="title_activity_line_graph">Overview</string>
+  <string name="title_activity_main">MainActivity</string>
+  <string name="button_week">1 Week</string>
+  <string name="button_two_weeks">2 Weeks</string>
+  <string name="button_month">1 Month</string>
 </resources>
