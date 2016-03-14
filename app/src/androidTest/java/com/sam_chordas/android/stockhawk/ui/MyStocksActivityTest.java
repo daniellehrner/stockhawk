@@ -9,7 +9,6 @@ import android.support.test.runner.AndroidJUnit4;
 import com.db.chart.model.LineSet;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.StockHawkApplication;
-import com.sam_chordas.android.stockhawk.customMatcher.ToastMatcher;
 import com.sam_chordas.android.stockhawk.dependencyInjection.TestingComponent;
 import com.sam_chordas.android.stockhawk.rest.HistoricalDataClient;
 
@@ -23,7 +22,6 @@ import javax.inject.Inject;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withClassName;

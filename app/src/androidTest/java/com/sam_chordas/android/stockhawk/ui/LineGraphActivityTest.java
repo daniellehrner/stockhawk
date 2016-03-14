@@ -2,6 +2,7 @@ package com.sam_chordas.android.stockhawk.ui;
 
 import android.app.Instrumentation;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -21,12 +22,14 @@ import org.mockito.Mockito;
 import javax.inject.Inject;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.hasContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static com.sam_chordas.android.stockhawk.customMatcher.ButtonBackgroundMatcher.withButtonBackgroundColor;
+import static com.sam_chordas.android.stockhawk.customMatcher.ButtonTextColorMatcher.withButtonTextColor;
 
 @RunWith(AndroidJUnit4.class)
 public class LineGraphActivityTest {
@@ -58,21 +61,10 @@ public class LineGraphActivityTest {
     }
 
     @Test
-    public void shouldMockRestClient() {
+    public void shouldShowWeekGraph() {
         String stringStub[] = {"Fr", "Sa", "So"};
         float floatStub[] = {(float)75.0, (float)75.0, (float)100.0};
         LineSet dataStub = new LineSet(stringStub, floatStub);
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for (int i = 0; i < stringStub.length; ++i) {
-            stringBuilder.append(stringStub[i])
-                    .append(": ")
-                    .append(floatStub[i]);
-
-            if (i < stringStub.length - 1) {
-                stringBuilder.append(", ");
-            }
-        }
 
         Mockito.when(mHistoricalDataClient.getData("test", 7)).thenReturn(dataStub);
 
@@ -81,6 +73,76 @@ public class LineGraphActivityTest {
 
         mActivityRule.launchActivity(intent);
 
-        onView(withId(R.id.linechart)).check(matches(withContentDescription(stringBuilder.toString())));
+        onView(withId(R.id.linechart)).check(
+                matches(withContentDescription(
+                        createGraphHint(stringStub, floatStub)
+                )));
+
+//        onView(withId(R.id.button_week)).check(matches(withButtonTextColor(Color.YELLOW)));
+//        onView(withId(R.id.button_two_weeks)).check(matches(withButtonTextColor(Color.GRAY)));
+//        onView(withId(R.id.button_month)).check(matches(withButtonTextColor(Color.BLACK)));
+        onView(withId(R.id.button_month)).check(matches(withButtonBackgroundColor(Color.GRAY)));
+    }
+
+    @Test
+    public void shouldShowTwoWeekGraph() {
+        String stringStub[] = {"Fr", "Sa", "So"};
+        float floatStub[] = {(float)75.0, (float)100.0, (float)150.0};
+        LineSet dataStub = new LineSet(stringStub, floatStub);
+
+        Mockito.when(mHistoricalDataClient.getData("test2", 7)).thenReturn(dataStub);
+        Mockito.when(mHistoricalDataClient.getData("test2", 14)).thenReturn(dataStub);
+
+        Intent intent = new Intent();
+        intent.putExtra(LineGraphActivity.KEY_SYM, "test2");
+
+        mActivityRule.launchActivity(intent);
+
+        onView(withId(R.id.button_two_weeks)).perform(click());
+
+        onView(withId(R.id.linechart)).check(
+                matches(withContentDescription(
+                        createGraphHint(stringStub, floatStub)
+                )));
+
+
+    }
+
+    @Test
+    public void shouldShowMonthGraph() {
+        String stringStub[] = {"So", "Mo", "Tu", "Mi"};
+        float floatStub[] = {(float)1.0, (float)7.0, (float)15.0, (float)20.0};
+        LineSet dataStub = new LineSet(stringStub, floatStub);
+
+        Mockito.when(mHistoricalDataClient.getData("test3", 7)).thenReturn(dataStub);
+        Mockito.when(mHistoricalDataClient.getData("test3", 30)).thenReturn(dataStub);
+
+        Intent intent = new Intent();
+        intent.putExtra(LineGraphActivity.KEY_SYM, "test3");
+
+        mActivityRule.launchActivity(intent);
+
+        onView(withId(R.id.button_month)).perform(click());
+
+        onView(withId(R.id.linechart)).check(
+                matches(withContentDescription(
+                        createGraphHint(stringStub, floatStub)
+                )));
+    }
+
+    private String createGraphHint(String[] labels, float[] values) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i = 0; i < labels.length; ++i) {
+            stringBuilder.append(labels[i])
+                    .append(": ")
+                    .append(values[i]);
+
+            if (i < labels.length - 1) {
+                stringBuilder.append(", ");
+            }
+        }
+
+        return stringBuilder.toString();
     }
 }

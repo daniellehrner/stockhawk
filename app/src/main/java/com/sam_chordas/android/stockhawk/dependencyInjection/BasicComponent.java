@@ -1,6 +1,5 @@
 package com.sam_chordas.android.stockhawk.dependencyInjection;
 
-import com.sam_chordas.android.stockhawk.rest.HistoricalDataClient;
 import com.sam_chordas.android.stockhawk.rest.HistoricalDataClientImpl;
 import com.sam_chordas.android.stockhawk.service.StockTaskService;
 import com.sam_chordas.android.stockhawk.ui.LineGraphActivity;

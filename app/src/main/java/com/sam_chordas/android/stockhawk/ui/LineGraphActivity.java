@@ -72,7 +72,7 @@ public class LineGraphActivity extends AppCompatActivity {
         // set variable to a valid value
         mLastButtonPressedId = R.id.button_month;
         // always start with weekly overview
-        mButtonWeek.performClick();
+        buttonClick(mButtonWeek);
     }
 
     private void createObservable() {
@@ -215,7 +215,6 @@ public class LineGraphActivity extends AppCompatActivity {
 
         mProgressBar.setVisibility(View.GONE);
         mLineChartView.setVisibility(View.VISIBLE);
-        mButtons.setVisibility(View.VISIBLE);
 
         mLineChartView.show(anim);
     }

@@ -7,7 +7,6 @@ import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
 import android.app.Application;
-import android.content.Context;
 
 import javax.inject.Singleton;
 
