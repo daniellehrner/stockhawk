@@ -4,6 +4,9 @@ import com.sam_chordas.android.stockhawk.dependencyInjection.BasicComponent;
 import com.sam_chordas.android.stockhawk.dependencyInjection.DaggerTestingComponent;
 import com.sam_chordas.android.stockhawk.dependencyInjection.MockModule;
 
+/**
+ * Created by Daniel Lehrner
+ */
 public class MockApplication extends StockHawkApplication {
     @Override
     public BasicComponent createComponent() {

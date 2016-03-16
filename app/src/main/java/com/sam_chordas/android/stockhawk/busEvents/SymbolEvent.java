@@ -1,5 +1,8 @@
 package com.sam_chordas.android.stockhawk.busEvents;
 
+/**
+ * Created by Daniel Lehrner
+ */
 public class SymbolEvent {
     public enum STATE {SUCCESS, FAILURE}
 

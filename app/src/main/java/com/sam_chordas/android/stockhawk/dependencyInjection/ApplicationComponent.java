@@ -4,6 +4,9 @@ import javax.inject.Singleton;
 
 import dagger.Component;
 
+/**
+ * Created by Daniel Lehrner
+ */
 @SuppressWarnings("unused")
 @Singleton
 @Component(modules = {

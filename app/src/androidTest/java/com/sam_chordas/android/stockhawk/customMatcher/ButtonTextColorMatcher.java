@@ -9,6 +9,9 @@ import android.widget.Button;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 
+/**
+ * Created by Daniel Lehrner
+ */
 public class ButtonTextColorMatcher {
     /**
      * Returns a matcher that matches {@link Button}s based on background color value.

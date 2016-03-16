@@ -22,6 +22,9 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.core.StringEndsWith.endsWith;
 
+/**
+ * Created by Daniel Lehrner
+ */
 @RunWith(AndroidJUnit4.class)
 public class ToastTest {
     @Rule

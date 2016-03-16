@@ -7,6 +7,10 @@ import android.view.WindowManager;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 
+/**
+ * Created by Daniel Lehrner
+ */
+
 // https://stackoverflow.com/questions/33961861/nomatchingrootexception-espresso-with-custom-toast
 public class ToastMatcher extends TypeSafeMatcher<Root> {
 

@@ -12,6 +12,9 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 
+/**
+ * Created by Daniel Lehrner
+ */
 @Module
 public class MockModule {
     @Provides

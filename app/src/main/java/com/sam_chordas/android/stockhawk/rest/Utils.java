@@ -1,8 +1,11 @@
 package com.sam_chordas.android.stockhawk.rest;
 
 import android.content.ContentProviderOperation;
+import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
+import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
 
@@ -10,12 +13,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Utils {
+  // avoid initialization of class
+  private Utils() {};
 
   private static String LOG_TAG = Utils.class.getSimpleName();
 
@@ -75,7 +81,7 @@ public class Utils {
   }
 
   public static String truncateChange(String change, boolean isPercentChange){
-    String weight = change.substring(0,1);
+    String weight = change.substring(0, 1);
     String ampersand = "";
     if (isPercentChange){
       ampersand = change.substring(change.length() - 1, change.length());
@@ -132,25 +138,90 @@ public class Utils {
     return builder.build();
   }
 
-  public static String getCalculatedDate(String dateFormat, int days) {
+  public static String getCalculatedDate(String dateFormat, int days)
+          throws NullPointerException {
+
+    if(dateFormat == null) {
+      throw new NullPointerException("dateFormat is null");
+    }
+
     Calendar cal = Calendar.getInstance();
-    SimpleDateFormat s = new SimpleDateFormat(dateFormat);
     cal.add(Calendar.DAY_OF_YEAR, days);
+    SimpleDateFormat s = new SimpleDateFormat(dateFormat);
+
     return s.format(new Date(cal.getTimeInMillis()));
   }
 
-  public static int roundToNextTen(int v, boolean directionUp) {
-    int x;
-
-    if (directionUp) {
-      x = 10 - (v % 10);
-      v += x;
+  public static int roundToNextTen(int v, boolean directionUp)
+          throws IllegalArgumentException {
+    if (v < 0) {
+      throw new IllegalArgumentException("value has to be greater or equal to zero");
     }
-    else {
-      x = (v % 10);
-      v -= x;
+
+    int moduloValue = v % 10;
+
+    if (moduloValue != 0){
+      if (directionUp) {
+        int x = 10 - (moduloValue);
+        v += x;
+      } else {
+        v -= moduloValue;
+      }
     }
 
     return v;
+  }
+
+  public static @Nullable String convertDateToWeekday(String date,
+                                                      Context context)
+                                                      throws NullPointerException {
+    if (date == null) {
+      throw new NullPointerException("date is null");
+    }
+
+    if (context == null) {
+      throw new NullPointerException("context is null");
+    }
+
+    // format YYYY-MM-DD
+    String[] datePieces = date.split("-");
+    Calendar calendar = Calendar.getInstance();
+
+    // month parameter in Calendar.set(int, int, int) start with zero not one!
+    int month = Integer.parseInt(datePieces[1]) -1;
+
+    calendar.set(Integer.parseInt(datePieces[0]),
+            month,
+            Integer.parseInt(datePieces[2]));
+
+    int dayOfTheWeek = calendar.get(Calendar.DAY_OF_WEEK);
+
+    String dayString = null;
+
+    switch (dayOfTheWeek) {
+      case Calendar.MONDAY:
+        dayString = context.getString(R.string.mon_short);
+        break;
+      case Calendar.TUESDAY:
+        dayString = context.getString(R.string.tue_short);
+        break;
+      case Calendar.WEDNESDAY:
+        dayString = context.getString(R.string.wed_short);
+        break;
+      case Calendar.THURSDAY:
+        dayString = context.getString(R.string.thu_short);
+        break;
+      case Calendar.FRIDAY:
+        dayString = context.getString(R.string.fri_short);
+        break;
+      case Calendar.SATURDAY:
+        dayString = context.getString(R.string.sat_short);
+        break;
+      case Calendar.SUNDAY:
+        dayString = context.getString(R.string.sun_short);
+        break;
+    }
+
+    return dayString;
   }
 }

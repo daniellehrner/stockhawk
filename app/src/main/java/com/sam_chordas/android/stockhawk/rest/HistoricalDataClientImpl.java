@@ -17,6 +17,9 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
+/**
+ * Created by Daniel Lehrner
+ */
 public class HistoricalDataClientImpl implements HistoricalDataClient {
     private final String LOG_TAG = this.getClass().getSimpleName();
 

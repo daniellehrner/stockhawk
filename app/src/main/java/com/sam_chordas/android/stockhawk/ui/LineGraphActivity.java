@@ -2,6 +2,7 @@ package com.sam_chordas.android.stockhawk.ui;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,9 +14,13 @@ import android.widget.RelativeLayout;
 
 import com.db.chart.Tools;
 import com.db.chart.model.LineSet;
+import com.db.chart.view.ChartView;
 import com.db.chart.view.LineChartView;
 import com.db.chart.view.animation.Animation;
+import com.db.chart.view.animation.easing.CircEase;
 import com.db.chart.view.animation.easing.CubicEase;
+import com.db.chart.view.animation.easing.ElasticEase;
+import com.db.chart.view.animation.easing.SineEase;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.StockHawkApplication;
 import com.sam_chordas.android.stockhawk.rest.HistoricalDataClient;
@@ -36,8 +41,13 @@ import rx.subjects.PublishSubject;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+/**
+ * Created by Daniel Lehrner
+ */
 public class LineGraphActivity extends AppCompatActivity {
-    public static String KEY_SYM = "LineGraphActivity.KEY_SYM";
+    enum TIME_FRAME {WEEK, TWO_WEEKS, MONTH, INVALID}
+
+    public static final String KEY_SYM = "LineGraphActivity.KEY_SYM";
     private final String LOG_TAG = this.getClass().getSimpleName();
 
     @Bind(R.id.loader) ProgressBar mProgressBar;
@@ -160,9 +170,70 @@ public class LineGraphActivity extends AppCompatActivity {
 
     private void updateGraph(LineSet data) {
         mLineChartView.reset();
+        int dataSize = data.size();
+        Log.d(LOG_TAG, "dataSize: " + dataSize);
+
+        float[] values = new float[dataSize];
+        String[] formatedDates = new String[dataSize];
+
+        switch (getSelectedTimeFrame()) {
+            case WEEK:
+                for (int i = 0; i < dataSize; ++i) {
+                    try {
+                        formatedDates[i] = Utils.convertDateToWeekday(data.getLabel(i), this);
+                    }
+                    catch (NullPointerException e) {
+                        Log.e(LOG_TAG, "data.getLabel(" + i + ") is null:" + e.toString());
+                    }
+                    values[i] = data.getValue(i);
+                }
+
+                data = new LineSet(formatedDates, values);
+                break;
+            case TWO_WEEKS:
+                for (int i = 0; i < dataSize; ++i) {
+                    if ((i % 3) == 0) {
+                        formatedDates[i] = data.getLabel(i);
+                    }
+                    else if (i == dataSize - 1) {
+                        formatedDates[i] = Utils.convertDateToWeekday(data.getLabel(i), this);
+                    }
+                    else {
+                        formatedDates[i] = "";
+                    }
+
+                    values[i] = data.getValue(i);
+                }
+
+                data = new LineSet(formatedDates, values);
+                break;
+            case MONTH:
+                for (int i = 0; i < dataSize; ++i) {
+                    if ((i % 5) == 0) {
+                        formatedDates[i] = data.getLabel(i);
+                    }
+                    else if (i == dataSize - 1) {
+                        formatedDates[i] = Utils.convertDateToWeekday(data.getLabel(i), this);
+                    }
+                    else {
+                        formatedDates[i] = "";
+                    }
+
+                    values[i] = data.getValue(i);
+                }
+
+                data = new LineSet(formatedDates, values);
+                break;
+            default:
+                Log.e(LOG_TAG, "Time frame is invalid");
+        }
 
         mLineChartView.setAxisColor(Color.WHITE)
                 .setLabelsColor(Color.WHITE);
+
+        Paint paint = new Paint();
+        paint.setColor(Color.GRAY);
+        mLineChartView.setGrid(ChartView.GridType.VERTICAL, 2, dataSize, paint);
 
         data.setColor(Color.YELLOW)
                 .setDotsRadius(Tools.fromDpToPx(4))
@@ -179,7 +250,8 @@ public class LineGraphActivity extends AppCompatActivity {
         }
 
         Animation anim = new Animation()
-                .setEasing(new CubicEase());
+                .setEasing(new CubicEase()
+                );
 
         StringBuilder descriptionBuilder = new StringBuilder();
 
@@ -205,7 +277,6 @@ public class LineGraphActivity extends AppCompatActivity {
 
         mLineChartView.setContentDescription(descriptionBuilder.toString());
 
-
         int maxRoundUp = Utils.roundToNextTen((int) maxValue, true);
         int minRoundDown = Utils.roundToNextTen((int) minValue, false);
 
@@ -217,6 +288,20 @@ public class LineGraphActivity extends AppCompatActivity {
         mLineChartView.setVisibility(View.VISIBLE);
 
         mLineChartView.show(anim);
+    }
+
+    private TIME_FRAME getSelectedTimeFrame() {
+        if (mButtonWeek.getCurrentTextColor() == Color.BLACK) {
+            return TIME_FRAME.WEEK;
+        }
+        else if (mButtonTwoWeeks.getCurrentTextColor() == Color.BLACK) {
+            return TIME_FRAME.TWO_WEEKS;
+        }
+        else if (mButtonMonth.getCurrentTextColor() == Color.BLACK) {
+            return TIME_FRAME.MONTH;
+        }
+
+        return TIME_FRAME.INVALID;
     }
 
     @Override

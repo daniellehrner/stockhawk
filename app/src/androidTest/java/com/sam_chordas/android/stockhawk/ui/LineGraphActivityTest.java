@@ -31,6 +31,9 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static com.sam_chordas.android.stockhawk.customMatcher.ButtonBackgroundMatcher.withButtonBackgroundColor;
 import static com.sam_chordas.android.stockhawk.customMatcher.ButtonTextColorMatcher.withButtonTextColor;
 
+/**
+ * Created by Daniel Lehrner
+ */
 @RunWith(AndroidJUnit4.class)
 public class LineGraphActivityTest {
     @Rule
@@ -78,10 +81,6 @@ public class LineGraphActivityTest {
                         createGraphHint(stringStub, floatStub)
                 )));
 
-//        onView(withId(R.id.button_week)).check(matches(withButtonTextColor(Color.YELLOW)));
-//        onView(withId(R.id.button_two_weeks)).check(matches(withButtonTextColor(Color.GRAY)));
-//        onView(withId(R.id.button_month)).check(matches(withButtonTextColor(Color.BLACK)));
-        onView(withId(R.id.button_month)).check(matches(withButtonBackgroundColor(Color.GRAY)));
     }
 
     @Test

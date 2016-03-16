@@ -7,6 +7,9 @@ import javax.inject.Singleton;
 
 import dagger.Component;
 
+/**
+ * Created by Daniel Lehrner
+ */
 @Singleton
 @Component(modules = { MockModule.class })
 public interface TestingComponent extends BasicComponent {
