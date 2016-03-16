@@ -12,6 +12,7 @@ import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
 import com.sam_chordas.android.stockhawk.StockHawkApplication;
+import com.sam_chordas.android.stockhawk.busEvents.ServerDownEvent;
 import com.sam_chordas.android.stockhawk.busEvents.SymbolEvent;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
@@ -126,6 +127,12 @@ public class StockTaskService extends GcmTaskService{
       Log.d("StockTaskService", "URL: " + urlString);
       try{
         getResponse = fetchData(urlString);
+
+        // server doesn't find table on datatables.org (backend of yahoo.finance.quotes)
+        if (getResponse.startsWith("{\"error\":{")) {
+          throw new IllegalStateException("Server is down");
+        }
+
         result = GcmNetworkManager.RESULT_SUCCESS;
         try {
           ContentValues contentValues = new ContentValues();
@@ -147,8 +154,13 @@ public class StockTaskService extends GcmTaskService{
         }catch (RemoteException | OperationApplicationException e){
           Log.e(LOG_TAG, "Error applying batch insert", e);
         }
-      } catch (IOException e){
+      }
+      catch (IOException e){
         e.printStackTrace();
+      }
+      catch (IllegalStateException e) {
+        Log.e(LOG_TAG, "Server is down");
+        mBus.post(new ServerDownEvent());
       }
     }
 

@@ -12,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
 import android.util.Log;
@@ -20,10 +19,14 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.StockHawkApplication;
+import com.sam_chordas.android.stockhawk.busEvents.ServerDownEvent;
 import com.sam_chordas.android.stockhawk.busEvents.SymbolEvent;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
@@ -41,6 +44,9 @@ import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import javax.inject.Inject;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 public class MyStocksActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
@@ -61,12 +67,18 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   private Cursor mCursor;
   boolean isConnected;
   @Inject Bus mBus;
+  @Bind(R.id.recycler_view) EmptyRecyclerView mRecyclerView;
+  @Bind(R.id.empty_text) TextView mEmptyView;
+  @Bind(R.id.empty_layout) LinearLayout mEmptyLayout;
+  @Bind(R.id.server_down_text) TextView mServerDownText;
+  @Bind(R.id.server_down_image) ImageView mServerDownImage;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
     ((StockHawkApplication) getApplication()).getComponent().inject(this);
+
 
     mContext = this;
     ConnectivityManager cm =
@@ -75,7 +87,10 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
     isConnected = activeNetwork != null &&
         activeNetwork.isConnectedOrConnecting();
+
     setContentView(R.layout.activity_my_stocks);
+    ButterKnife.bind(this);
+
     // The intent service is for executing immediate pulls from the Yahoo API
     // GCMTaskService can only schedule tasks, they cannot execute immediately
     mServiceIntent = new Intent(this, StockIntentService.class);
@@ -85,17 +100,17 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
       if (isConnected){
         startService(mServiceIntent);
       } else{
-        networkToast();
+        onServerDownEvent(new ServerDownEvent());
       }
     }
-    RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-    recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
     getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
     mCursorAdapter = new QuoteCursorAdapter(this, null);
-    recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(this,
+    mRecyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(this,
             new RecyclerViewItemClickListener.OnItemClickListener() {
-              @Override public void onItemClick(View v, int position) {
+              @Override
+              public void onItemClick(View v, int position) {
                 //TODO:
                 mCursor.moveToPosition(position);   // move to correct row in database
                 String symbol = mCursor.getString(mCursor.getColumnIndex("symbol"));
@@ -106,11 +121,12 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                 startActivity(intent);
               }
             }));
-    recyclerView.setAdapter(mCursorAdapter);
 
+    mRecyclerView.setAdapter(mCursorAdapter);
+    mRecyclerView.setEmptyView(mEmptyLayout);
 
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-    fab.attachToRecyclerView(recyclerView);
+    fab.attachToRecyclerView(mRecyclerView);
     fab.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
         if (isConnected){
@@ -126,7 +142,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                       new String[] { input.toString() }, null);
                   if (c != null && c.getCount() != 0) {
                     Toast toast =
-                        Toast.makeText(MyStocksActivity.this, "This stock is already saved!",
+                        Toast.makeText(MyStocksActivity.this, getString(R.string.stock_already_saved),
                             Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.CENTER, Gravity.CENTER, 0);
                     toast.show();
@@ -141,7 +157,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
               })
               .show();
         } else {
-          networkToast();
+          onServerDownEvent(new ServerDownEvent());
         }
 
       }
@@ -149,7 +165,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
     ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mCursorAdapter);
     mItemTouchHelper = new ItemTouchHelper(callback);
-    mItemTouchHelper.attachToRecyclerView(recyclerView);
+    mItemTouchHelper.attachToRecyclerView(mRecyclerView);
 
     mTitle = getTitle();
     if (isConnected){
@@ -187,10 +203,6 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     mBus.unregister(this);
   }
 
-  public void networkToast(){
-    Toast.makeText(mContext, getString(R.string.network_toast), Toast.LENGTH_SHORT).show();
-  }
-
   public void restoreActionBar() {
     ActionBar actionBar = getSupportActionBar();
     if (actionBar != null) {
@@ -220,6 +232,18 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
       });
 
     }
+  }
+
+  @Subscribe
+  public void onServerDownEvent(ServerDownEvent e) {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        mEmptyView.setVisibility(View.GONE);
+        mServerDownImage.setVisibility(View.VISIBLE);
+        mServerDownText.setVisibility(View.VISIBLE);
+      }
+    });
   }
 
   @Override

@@ -9,7 +9,7 @@ Part of the Udacity Android Developer Nanodegree. The app was created by another
 * Stock Hawk app has content descriptions for all buttons. :white_check_mark:
 * Stock Hawk app supports layout mirroring using both the LTR attribute and the start/end tags. 
 * Strings are all included in the strings.xml file and untranslatable strings have a translatable tag marked to false. :white_check_mark:
-* Stock Hawk displays a default text on screen when offline, to inform users that the list is empty or out of date.
+* Stock Hawk displays a default text on screen when offline, to inform users that the list is empty or out of date. :white_check_mark:
 
 ## Used libraries
 
@@ -18,6 +18,7 @@ Part of the Udacity Android Developer Nanodegree. The app was created by another
 * [Dagger 2](https://google.github.io/dagger/): Dependency injection
 * [Butterknife](https://jakewharton.github.io/butterknife/): View injection
 * [WilliamChart](https://github.com/diogobernardino/WilliamChart): Line charts
+* [RxAndroid](https://github.com/ReactiveX/RxAndroid): [Reactive Programming](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754#what-is-reactive-programming)
 
 ### Instrumentation Tests
 * [Espresso](https://google.github.io/android-testing-support-library/docs/espresso/): UI test framework

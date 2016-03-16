@@ -6,13 +6,13 @@
     android:layout_height="match_parent"
     fab:ignore="MergeRootFrame">
 
-  <android.support.v7.widget.RecyclerView
+  <com.sam_chordas.android.stockhawk.ui.EmptyRecyclerView
       android:id="@+id/recycler_view"
       android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      />
+      android:layout_height="match_parent" />
 
-  <com.melnykov.fab.FloatingActionButton
+
+    <com.melnykov.fab.FloatingActionButton
       android:id="@+id/fab"
       android:contentDescription="@string/add_stock"
       android:layout_width="wrap_content"
@@ -28,4 +28,38 @@
       fab:layout_anchor="recycler_view"
       fab:layout_anchorGravity="bottom | end"
       />
+
+    <LinearLayout
+        android:id="@+id/empty_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center">
+
+        <TextView
+            android:id="@+id/empty_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_view"
+            android:layout_gravity="center" />
+
+        <ImageView
+            android:id="@+id/server_down_image"
+            android:layout_width="200dp"
+            android:layout_height="217dp"
+            android:src="@drawable/signal_tower"
+            android:contentDescription="@string/signal_tower"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/server_down_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/server_down"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
 </FrameLayout>

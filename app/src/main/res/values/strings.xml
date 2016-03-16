@@ -24,4 +24,8 @@
   <string name="fri_short">Fri</string>
   <string name="sat_short">Sat</string>
   <string name="sun_short">Sun</string>
+  <string name="server_down">The server can\'t be reached. Please try again later.</string>
+  <string name="empty_view">No stocks added yet</string>
+  <string name="signal_tower">Image of a signal tower</string>
+  <string name="stock_already_saved">This stock is already saved</string>
 </resources>
