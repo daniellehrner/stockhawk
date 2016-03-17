@@ -68,7 +68,7 @@ dependencies {
   androidTestCompile 'com.android.support:support-annotations:23.2.1'
 
   androidTestCompile('com.android.support.test.espresso:espresso-contrib:2.2.1') {
-    exclude group: 'com.android.support', module: 'appcompat'
+    exclude module: 'appcompat'
     exclude module: 'support-annotations'
     exclude module: 'support-v4'
     exclude module: 'support-v13'
@@ -79,4 +79,5 @@ dependencies {
   androidTestCompile "com.google.dexmaker:dexmaker:1.2"
   androidTestCompile "com.google.dexmaker:dexmaker-mockito:1.2"
   androidTestApt 'com.google.dagger:dagger-compiler:2.0.2'
+  androidTestProvided 'javax.annotation:jsr250-api:1.0'
 }

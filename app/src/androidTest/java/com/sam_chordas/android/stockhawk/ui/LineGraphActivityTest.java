@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
 
 import com.db.chart.model.LineSet;
 import com.sam_chordas.android.stockhawk.R;
@@ -65,8 +66,8 @@ public class LineGraphActivityTest {
 
         onView(withId(R.id.linechart)).
                 check(
-                    matches(isDisplayed()
-                ));
+                        matches(isDisplayed()
+                        ));
     }
 
     @Test
@@ -125,6 +126,13 @@ public class LineGraphActivityTest {
         mActivityRule.launchActivity(intent);
 
         onView(withId(R.id.button_month)).perform(click());
+
+        try {
+            Thread.sleep(10000);
+        }
+        catch (InterruptedException e) {
+            Log.e("test", "sleep interrupted:" + e.toString());
+        }
 
         onView(withId(R.id.linechart)).check(
                 matches(withContentDescription(

@@ -17,10 +17,7 @@ import com.db.chart.model.LineSet;
 import com.db.chart.view.ChartView;
 import com.db.chart.view.LineChartView;
 import com.db.chart.view.animation.Animation;
-import com.db.chart.view.animation.easing.CircEase;
 import com.db.chart.view.animation.easing.CubicEase;
-import com.db.chart.view.animation.easing.ElasticEase;
-import com.db.chart.view.animation.easing.SineEase;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.StockHawkApplication;
 import com.sam_chordas.android.stockhawk.rest.HistoricalDataClient;
@@ -50,7 +47,7 @@ public class LineGraphActivity extends AppCompatActivity {
     public static final String KEY_SYM = "LineGraphActivity.KEY_SYM";
     private final String LOG_TAG = this.getClass().getSimpleName();
 
-    @Bind(R.id.loader) ProgressBar mProgressBar;
+//    @Bind(R.id.loader) ProgressBar mProgressBar;
     @Bind(R.id.linechart) LineChartView mLineChartView;
     @Bind(R.id.durationButtons) RelativeLayout mButtons;
     @Bind(R.id.button_week) Button mButtonWeek;
@@ -128,7 +125,7 @@ public class LineGraphActivity extends AppCompatActivity {
             return;
         }
 
-        mProgressBar.setVisibility(View.VISIBLE);
+//        mProgressBar.setVisibility(View.VISIBLE);
         mLineChartView.setVisibility(View.GONE);
 
         switch(mLastButtonPressedId) {
@@ -284,7 +281,7 @@ public class LineGraphActivity extends AppCompatActivity {
                 maxRoundUp,
                 (maxRoundUp - minRoundDown) / 5);
 
-        mProgressBar.setVisibility(View.GONE);
+//        mProgressBar.setVisibility(View.GONE);
         mLineChartView.setVisibility(View.VISIBLE);
 
         mLineChartView.show(anim);

@@ -7,15 +7,18 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter "extra-android-support"
 
 test:
+  pre:
+      # start the emulator
+      - emulator -avd circleci-android22 -no-audio -no-window:
+          background: true
+          parallel: true
   override:
-    # start the emulator
-    - emulator -avd circleci-android23 -no-audio -no-window:
-        background: true
-        parallel: true
+    # compile app
+    - ./gradlew clean assemble -PdisablePreDex
     # wait for it to have booted
     - circle-android wait-for-boot
     # run tests  against the emulator.
-    - ./gradlew clean assemble -PdisablePreDex
+    - ./gradlew test
     - ./gradlew connectedAndroidTest
     # copy the build outputs to artifacts
     - cp -r my-project/build/outputs $CIRCLE_ARTIFACTS
