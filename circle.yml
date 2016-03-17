@@ -17,7 +17,8 @@ test:
           background: true
           parallel: true
       # compile app
-      - ./gradlew clean assemble -PdisablePreDex
+      - ./gradlew clean assembleDebug -PdisablePreDex
+      - ./gradlew clean assembleAndroidTest -PdisablePreDex
   override:
     # wait for it to have booted
     - circle-android wait-for-boot
