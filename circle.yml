@@ -16,9 +16,9 @@ test:
       - emulator -avd circleci-android22 -no-audio -no-window:
           background: true
           parallel: true
+      # compile app
+      - ./gradlew clean assemble -PdisablePreDex
   override:
-    # compile app
-    - ./gradlew clean assemble -PdisablePreDex
     # wait for it to have booted
     - circle-android wait-for-boot
     # run tests  against the emulator.
