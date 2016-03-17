@@ -31,6 +31,7 @@ public class MockModule {
 
     @Provides
     public OkHttpClient providesClient() {
+//        return Mockito.mock(OkHttpClient.class);
         return new OkHttpClient();
     }
 }

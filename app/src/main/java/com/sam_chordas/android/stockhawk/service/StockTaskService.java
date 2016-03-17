@@ -37,12 +37,12 @@ import javax.inject.Inject;
 public class StockTaskService extends GcmTaskService{
   private String LOG_TAG = StockTaskService.class.getSimpleName();
 
-  private OkHttpClient client = new OkHttpClient();
   private Context mContext;
   private StringBuilder mStoredSymbols = new StringBuilder();
   private boolean isUpdate;
 
   @Inject Bus mBus;
+  @Inject OkHttpClient mClient;
 
   public StockTaskService(){}
 
@@ -50,12 +50,13 @@ public class StockTaskService extends GcmTaskService{
     mContext = context;
     ((StockHawkApplication) mContext.getApplicationContext()).getComponent().inject(this);
   }
-  String fetchData(String url) throws IOException{
+
+  private String fetchData(String url) throws IOException{
     Request request = new Request.Builder()
         .url(url)
         .build();
 
-    Response response = client.newCall(request).execute();
+    Response response = mClient.newCall(request).execute();
     return response.body().string();
   }
 

@@ -7,7 +7,7 @@ Part of the Udacity Android Developer Nanodegree. The app was created by another
 * Stock Hawk does not crash when a user searches for a non-existent stock. :white_check_mark:
 * Stock Hawk Stocks can be displayed in a collection widget.
 * Stock Hawk app has content descriptions for all buttons. :white_check_mark:
-* Stock Hawk app supports layout mirroring using both the LTR attribute and the start/end tags. 
+* Stock Hawk app supports layout mirroring using both the LTR attribute and the start/end tags. :white_check_mark:
 * Strings are all included in the strings.xml file and untranslatable strings have a translatable tag marked to false. :white_check_mark:
 * Stock Hawk displays a default text on screen when offline, to inform users that the list is empty or out of date. :white_check_mark:
 

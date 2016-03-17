@@ -11,6 +11,7 @@ import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.StockHawkApplication;
 import com.sam_chordas.android.stockhawk.dependencyInjection.TestingComponent;
 import com.sam_chordas.android.stockhawk.rest.HistoricalDataClient;
+import com.squareup.okhttp.Response;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -71,6 +72,9 @@ public class MyStocksActivityTest {
         String stringStub[] = {"Fr", "Sa", "So"};
         float floatStub[] = {(float)75.0, (float)75.0, (float)100.0};
         LineSet dataStub = new LineSet(stringStub, floatStub);
+
+//        Response.Builder responseBuilder = new Response.Builder();
+//        responseBuilder.message("Test").networkResponse().build();
 
         Mockito.when(mHistoricalDataClient.getData("YHOO", 7)).thenReturn(dataStub);
 
