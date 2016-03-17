@@ -69,9 +69,9 @@ public class MyStocksActivityTest {
 
     @Test
     public void shouldShowLineGraphActivity() {
-        String stringStub[] = {"Fr", "Sa", "So"};
+        String stringStubDate[] = {"2016-03-14", "2016-02-14", "2016-01-14"};
         float floatStub[] = {(float)75.0, (float)75.0, (float)100.0};
-        LineSet dataStub = new LineSet(stringStub, floatStub);
+        LineSet dataStub = new LineSet(stringStubDate, floatStub);
 
 //        Response.Builder responseBuilder = new Response.Builder();
 //        responseBuilder.message("Test").networkResponse().build();

@@ -1,13 +1,10 @@
 package com.sam_chordas.android.stockhawk.ui;
 
 import android.app.Instrumentation;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
 
 import com.db.chart.model.LineSet;
 import com.sam_chordas.android.stockhawk.R;
@@ -27,20 +24,17 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static com.sam_chordas.android.stockhawk.customMatcher.ButtonBackgroundMatcher.withButtonBackgroundColor;
-import static com.sam_chordas.android.stockhawk.customMatcher.ButtonTextColorMatcher.withButtonTextColor;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.core.StringEndsWith.endsWith;
 
 /**
  * Created by Daniel Lehrner
  */
 @RunWith(AndroidJUnit4.class)
 public class LineGraphActivityTest {
+
     @Rule
     public ActivityTestRule<LineGraphActivity> mActivityRule = new ActivityTestRule<>(
             LineGraphActivity.class,
@@ -58,25 +52,16 @@ public class LineGraphActivityTest {
     }
 
     @Test
-    public void shouldShowLineGraphActivity() {
-        Intent intent = new Intent();
-        intent.putExtra(LineGraphActivity.KEY_SYM, "test");
-
-        mActivityRule.launchActivity(intent);
-
-        onView(withId(R.id.linechart)).
-                check(
-                        matches(isDisplayed()
-                        ));
-    }
-
-    @Test
     public void shouldShowWeekGraph() {
-        String stringStub[] = {"Fr", "Sa", "So"};
+        String stringStubDate[] = {"2016-03-14", "2016-02-14", "2016-01-14"};
+        String stringStubDay[] = {"Mon", "Sun", "Thu"};
         float floatStub[] = {(float)75.0, (float)75.0, (float)100.0};
-        LineSet dataStub = new LineSet(stringStub, floatStub);
+        LineSet dataStub = new LineSet(stringStubDate, floatStub);
 
-        Mockito.when(mHistoricalDataClient.getData("test", 7)).thenReturn(dataStub);
+        Mockito.when(mHistoricalDataClient.getData(
+                Mockito.anyString(),
+                Mockito.anyInt()))
+                .thenReturn(dataStub);
 
         Intent intent = new Intent();
         intent.putExtra(LineGraphActivity.KEY_SYM, "test");
@@ -85,15 +70,16 @@ public class LineGraphActivityTest {
 
         onView(withId(R.id.linechart)).check(
                 matches(withContentDescription(
-                        createGraphHint(stringStub, floatStub)
+                        createGraphHint(stringStubDay, floatStub)
                 )));
     }
 
     @Test
     public void shouldShowTwoWeekGraph() {
-        String stringStub[] = {"Fr", "Sa", "So"};
+        String stringStubDate[] = {"2016-03-14", "2016-02-14", "2016-01-14"};
+        String stringStubDay[] = {"2016-03-14", "", "Thu"};
         float floatStub[] = {(float)75.0, (float)100.0, (float)150.0};
-        LineSet dataStub = new LineSet(stringStub, floatStub);
+        LineSet dataStub = new LineSet(stringStubDate, floatStub);
 
         Mockito.when(mHistoricalDataClient.getData("test2", 7)).thenReturn(dataStub);
         Mockito.when(mHistoricalDataClient.getData("test2", 14)).thenReturn(dataStub);
@@ -107,15 +93,16 @@ public class LineGraphActivityTest {
 
         onView(withId(R.id.linechart)).check(
                 matches(withContentDescription(
-                        createGraphHint(stringStub, floatStub)
+                        createGraphHint(stringStubDay, floatStub)
                 )));
     }
 
     @Test
     public void shouldShowMonthGraph() {
-        String stringStub[] = {"So", "Mo", "Tu", "Mi"};
-        float floatStub[] = {(float)1.0, (float)7.0, (float)15.0, (float)20.0};
-        LineSet dataStub = new LineSet(stringStub, floatStub);
+        String stringStubDate[] = {"2016-03-14", "2016-02-14", "2016-01-14"};
+        String stringStubDay[] = {"2016-03-14", "", "Thu"};
+        float floatStub[] = {(float)7.0, (float)15.0, (float)20.0};
+        LineSet dataStub = new LineSet(stringStubDate, floatStub);
 
         Mockito.when(mHistoricalDataClient.getData("test3", 7)).thenReturn(dataStub);
         Mockito.when(mHistoricalDataClient.getData("test3", 30)).thenReturn(dataStub);
@@ -127,16 +114,9 @@ public class LineGraphActivityTest {
 
         onView(withId(R.id.button_month)).perform(click());
 
-        try {
-            Thread.sleep(10000);
-        }
-        catch (InterruptedException e) {
-            Log.e("test", "sleep interrupted:" + e.toString());
-        }
-
         onView(withId(R.id.linechart)).check(
                 matches(withContentDescription(
-                        createGraphHint(stringStub, floatStub)
+                        createGraphHint(stringStubDay, floatStub)
                 )));
     }
 
