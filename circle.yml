@@ -1,6 +1,6 @@
 machine:
   environment:
-    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError"'
+    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx512m -XX:+HeapDumpOnOutOfMemoryError"'
 
 dependencies:
   pre:
@@ -17,14 +17,13 @@ test:
           background: true
           parallel: true
       # compile app
-      - ./gradlew clean assembleDebug -PdisablePreDex
-      - ./gradlew clean assembleAndroidTest -PdisablePreDex
+      - ./gradlew clean assemble -PdisablePreDex
   override:
     # wait for it to have booted
     - circle-android wait-for-boot
     # run tests  against the emulator.
-    - ./gradlew test
-    - ./gradlew connectedAndroidTest -PtaskThreads=2
+    - ./gradlew test -PdisablePreDex
+    - ./gradlew connectedAndroidTest -PtaskThreads=2 -PdisablePreDex
     # copy the build outputs to artifacts
     - cp -r my-project/build/outputs $CIRCLE_ARTIFACTS
     # copy the test results to the test results directory.
