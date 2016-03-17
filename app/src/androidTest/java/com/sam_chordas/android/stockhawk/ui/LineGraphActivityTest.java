@@ -1,6 +1,7 @@
 package com.sam_chordas.android.stockhawk.ui;
 
 import android.app.Instrumentation;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.test.InstrumentationRegistry;
@@ -25,12 +26,14 @@ import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withClassName;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static com.sam_chordas.android.stockhawk.customMatcher.ButtonBackgroundMatcher.withButtonBackgroundColor;
 import static com.sam_chordas.android.stockhawk.customMatcher.ButtonTextColorMatcher.withButtonTextColor;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.core.StringEndsWith.endsWith;
 
 /**
  * Created by Daniel Lehrner
@@ -48,10 +51,22 @@ public class LineGraphActivityTest {
     @Before
     public void setUp() {
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
-        StockHawkApplication app
-                = (StockHawkApplication) instrumentation.getTargetContext().getApplicationContext();
+        StockHawkApplication app = (StockHawkApplication) instrumentation.getTargetContext().getApplicationContext();
         TestingComponent component = (TestingComponent) app.getComponent();
         component.inject(this);
+    }
+
+    @Test
+    public void shouldShowLineGraphActivity() {
+        Intent intent = new Intent();
+        intent.putExtra(LineGraphActivity.KEY_SYM, "test");
+
+        mActivityRule.launchActivity(intent);
+
+        onView(withId(R.id.linechart)).
+                check(
+                    matches(isDisplayed()
+                ));
     }
 
     @Test
@@ -71,7 +86,6 @@ public class LineGraphActivityTest {
                 matches(withContentDescription(
                         createGraphHint(stringStub, floatStub)
                 )));
-
     }
 
     @Test
@@ -94,8 +108,6 @@ public class LineGraphActivityTest {
                 matches(withContentDescription(
                         createGraphHint(stringStub, floatStub)
                 )));
-
-
     }
 
     @Test

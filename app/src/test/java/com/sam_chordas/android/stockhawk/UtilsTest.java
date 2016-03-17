@@ -18,15 +18,10 @@ import static junit.framework.Assert.assertEquals;
  */
 @RunWith(RobolectricGradleTestRunner.class)
 public class UtilsTest {
-    private Context mContext;
+    private final Context mContext = RuntimeEnvironment.application;;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-
-    @Before
-    public void setUp() {
-        mContext = RuntimeEnvironment.application;
-    }
 
     @Test
     public void shouldConvertDateToWeekday() {

@@ -60,15 +60,15 @@ dependencies {
   testCompile "org.robolectric:robolectric:3.0"
 
   // instrumentation test
-  androidTestCompile 'com.android.support.test:runner:0.4.1'
-  androidTestCompile 'com.android.support.test:rules:0.4.1'
-  androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+  androidTestCompile 'com.android.support.test:runner:0.5'
+  androidTestCompile 'com.android.support.test:rules:0.5'
+  androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
   // Force usage of support annotations in the test app, since it is internally used by the runner module.
   //noinspection GradleDependency
   androidTestCompile 'com.android.support:support-annotations:23.2.1'
 
-  // Espresso-contrib for DatePicker, RecyclerView, Drawer actions, Accessibility checks, CountingIdlingResource
-  androidTestCompile ('com.android.support.test.espresso:espresso-contrib:2.2.1') {
+  androidTestCompile('com.android.support.test.espresso:espresso-contrib:2.2.1') {
+    exclude group: 'com.android.support', module: 'appcompat'
     exclude module: 'support-annotations'
     exclude module: 'support-v4'
     exclude module: 'support-v13'
