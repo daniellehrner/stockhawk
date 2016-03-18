@@ -1,7 +1,11 @@
 package com.sam_chordas.android.stockhawk.ui;
 
+import android.app.Activity;
 import android.app.Instrumentation;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -120,6 +124,62 @@ public class LineGraphActivityTest {
                 )));
     }
 
+    @Test
+    public void shouldRetainStateAfterRotate() {
+        String stringStubDateWeek[] = {"2016-03-14", "2016-02-14", "2016-01-14"};
+        float floatStubWeek[] = {(float)75.0, (float)75.0, (float)100.0};
+
+        Mockito.when(mHistoricalDataClient.getData("testRotate", 7))
+                .thenReturn(new LineSet(stringStubDateWeek, floatStubWeek));
+
+        String stringStubDateTwoWeeks[] = {"2016-03-14", "2016-02-14", "2016-01-14"};
+        String stringStubLabelsTwoWeeks[] = {"2016-03-14", "", "Thu"};
+        float floatStubTwoWeeks[] = {(float)75.0, (float)100.0, (float)150.0};
+
+        Mockito.when(mHistoricalDataClient.getData("testRotate", 14))
+                .thenReturn(new LineSet(stringStubDateTwoWeeks, floatStubTwoWeeks));
+
+        String stringStubMonth[] = {"2016-03-14", "2016-02-14", "2016-01-14"};
+        String stringStubLabelsMonth[] = {"2016-03-14", "", "Thu"};
+        float floatStubMonth[] = {(float)7.0, (float)15.0, (float)20.0};
+
+        Mockito.when(mHistoricalDataClient.getData("testRotate", 30))
+                .thenReturn(new LineSet(stringStubMonth, floatStubMonth));
+
+        Intent intent = new Intent();
+        intent.putExtra(LineGraphActivity.KEY_SYM, "testRotate");
+
+        mActivityRule.launchActivity(intent);
+
+        onView(withId(R.id.button_two_weeks)).perform(click());
+
+        onView(withId(R.id.linechart)).check(
+                matches(withContentDescription(
+                        createGraphHint(stringStubLabelsTwoWeeks, floatStubTwoWeeks)
+                )));
+
+        rotateScreen();
+
+        onView(withId(R.id.linechart)).check(
+                matches(withContentDescription(
+                        createGraphHint(stringStubLabelsTwoWeeks, floatStubTwoWeeks)
+                )));
+
+        onView(withId(R.id.button_month)).perform(click());
+
+        onView(withId(R.id.linechart)).check(
+                matches(withContentDescription(
+                        createGraphHint(stringStubLabelsMonth, floatStubMonth)
+                )));
+
+        rotateScreen();
+
+        onView(withId(R.id.linechart)).check(
+                matches(withContentDescription(
+                        createGraphHint(stringStubLabelsMonth, floatStubMonth)
+                )));
+    }
+
     private String createGraphHint(String[] labels, float[] values) {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -134,5 +194,16 @@ public class LineGraphActivityTest {
         }
 
         return stringBuilder.toString();
+    }
+
+    private void rotateScreen() {
+        Context context = InstrumentationRegistry.getTargetContext();
+        int orientation = context.getResources().getConfiguration().orientation;
+
+        Activity activity = mActivityRule.getActivity();
+        activity.setRequestedOrientation(
+                (orientation == Configuration.ORIENTATION_PORTRAIT) ?
+                        ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE :
+                        ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 }

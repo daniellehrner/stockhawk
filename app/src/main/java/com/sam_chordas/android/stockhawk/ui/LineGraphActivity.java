@@ -42,9 +42,15 @@ import static java.lang.Math.min;
  * Created by Daniel Lehrner
  */
 public class LineGraphActivity extends AppCompatActivity {
+
+
     enum TIME_FRAME {WEEK, TWO_WEEKS, MONTH, INVALID}
 
     public static final String KEY_SYM = "LineGraphActivity.KEY_SYM";
+    private static final String STATE_LAST_BUTTON = "stockhawk.linegraph.last.button";
+    private static final String STATE_SYMBOL = "stockhawk.linegraph.symbol";
+    private static final String STATE_DATA_VALUES = "stockhawk.linegraph.data.values";
+    private static final String STATE_DATA_LABELS = "stockhawk.linegraph.data.labels";
     private final String LOG_TAG = this.getClass().getSimpleName();
 
     @Bind(R.id.loader) ProgressBar mProgressBar;
@@ -58,6 +64,8 @@ public class LineGraphActivity extends AppCompatActivity {
     private Subscription mHistoricalDataSubscription;
     private String mSymbol;
     private int mLastButtonPressedId;
+    private float[] mGraphValues;
+    private String[] mGraphLabels;
     @Inject HistoricalDataClient mRestClient;
 
     @Override
@@ -68,18 +76,42 @@ public class LineGraphActivity extends AppCompatActivity {
 
         ((StockHawkApplication)getApplication()).getComponent().inject(this);
 
-        Intent intent = getIntent();
-        mSymbol = intent.getStringExtra(KEY_SYM);
-
-        mButtonTwoWeeks.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
-        mButtonMonth.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
-
         createObservable();
 
-        // set variable to a valid value
-        mLastButtonPressedId = R.id.button_month;
-        // always start with weekly overview
-        buttonClick(mButtonWeek);
+        if (savedInstanceState != null) {
+            mSymbol = savedInstanceState.getString(STATE_SYMBOL);
+            mLastButtonPressedId = savedInstanceState.getInt(STATE_LAST_BUTTON);
+
+            for (Button b : new Button[]{mButtonWeek, mButtonTwoWeeks, mButtonMonth}) {
+                if (b.getId() == mLastButtonPressedId) {
+                    b.getBackground().setColorFilter(Color.YELLOW, PorterDuff.Mode.MULTIPLY);
+                    b.setTextColor(Color.BLACK);
+                }
+                else {
+                    b.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+                    b.setTextColor(Color.WHITE);
+                }
+            }
+
+            float[] values = savedInstanceState.getFloatArray(STATE_DATA_VALUES);
+            String[] labels = savedInstanceState.getStringArray(STATE_DATA_LABELS);
+
+            if (labels != null && values != null) {
+                updateGraph(new LineSet(labels, values));
+            }
+        }
+        else {
+            Intent intent = getIntent();
+            mSymbol = intent.getStringExtra(KEY_SYM);
+
+            mButtonTwoWeeks.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+            mButtonMonth.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+
+            // set variable to a valid value
+            mLastButtonPressedId = R.id.button_month;
+            // always start with weekly overview
+            buttonClick(mButtonWeek);
+        }
     }
 
     private void createObservable() {
@@ -170,57 +202,63 @@ public class LineGraphActivity extends AppCompatActivity {
         int dataSize = data.size();
         Log.d(LOG_TAG, "dataSize: " + dataSize);
 
-        float[] values = new float[dataSize];
+        mGraphValues = new float[dataSize];
+        mGraphLabels = new String[dataSize];
         String[] formatedDates = new String[dataSize];
 
         switch (getSelectedTimeFrame()) {
             case WEEK:
                 for (int i = 0; i < dataSize; ++i) {
                     try {
-                        formatedDates[i] = Utils.convertDateToWeekday(data.getLabel(i), this);
+                        mGraphLabels[i] = data.getLabel(i);
+                        formatedDates[i] = Utils.convertDateToWeekday(mGraphLabels[i], this);
                         Log.d(LOG_TAG, "formatedDate:" + formatedDates[i]);
                     }
                     catch (NullPointerException e) {
                         Log.e(LOG_TAG, "data.getLabel(" + i + ") is null:" + e.toString());
                     }
-                    values[i] = data.getValue(i);
+                    mGraphValues[i] = data.getValue(i);
                 }
 
-                data = new LineSet(formatedDates, values);
+                data = new LineSet(formatedDates, mGraphValues);
                 break;
             case TWO_WEEKS:
                 for (int i = 0; i < dataSize; ++i) {
+                    mGraphLabels[i] = data.getLabel(i);
+
                     if ((i % 3) == 0) {
-                        formatedDates[i] = data.getLabel(i);
+                        formatedDates[i] = mGraphLabels[i];
                     }
                     else if (i == dataSize - 1) {
-                        formatedDates[i] = Utils.convertDateToWeekday(data.getLabel(i), this);
+                        formatedDates[i] = Utils.convertDateToWeekday(mGraphLabels[i], this);
                     }
                     else {
                         formatedDates[i] = "";
                     }
 
-                    values[i] = data.getValue(i);
+                    mGraphValues[i] = data.getValue(i);
                 }
 
-                data = new LineSet(formatedDates, values);
+                data = new LineSet(formatedDates, mGraphValues);
                 break;
             case MONTH:
                 for (int i = 0; i < dataSize; ++i) {
+                    mGraphLabels[i] = data.getLabel(i);
+
                     if ((i % 5) == 0) {
-                        formatedDates[i] = data.getLabel(i);
+                        formatedDates[i] = mGraphLabels[i];
                     }
                     else if (i == dataSize - 1) {
-                        formatedDates[i] = Utils.convertDateToWeekday(data.getLabel(i), this);
+                        formatedDates[i] = Utils.convertDateToWeekday(mGraphLabels[i], this);
                     }
                     else {
                         formatedDates[i] = "";
                     }
 
-                    values[i] = data.getValue(i);
+                    mGraphValues[i] = data.getValue(i);
                 }
 
-                data = new LineSet(formatedDates, values);
+                data = new LineSet(formatedDates, mGraphValues);
                 break;
             default:
                 Log.e(LOG_TAG, "Time frame is invalid");
@@ -300,6 +338,16 @@ public class LineGraphActivity extends AppCompatActivity {
         }
 
         return TIME_FRAME.INVALID;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putInt(STATE_LAST_BUTTON, mLastButtonPressedId);
+        savedInstanceState.putString(STATE_SYMBOL, mSymbol);
+        savedInstanceState.putFloatArray(STATE_DATA_VALUES, mGraphValues);
+        savedInstanceState.putStringArray(STATE_DATA_LABELS, mGraphLabels);
+
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
