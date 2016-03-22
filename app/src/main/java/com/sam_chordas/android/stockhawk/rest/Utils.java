@@ -183,6 +183,11 @@ public class Utils {
       throw new NullPointerException("context is null");
     }
 
+    // if it is yesterday's date return "Yesterday"
+    if (date.equals(getCalculatedDate("yyyy-MM-dd", -1))) {
+      return context.getString(R.string.yesterday);
+    }
+
     // format YYYY-MM-DD
     String[] datePieces = date.split("-");
     Calendar calendar = Calendar.getInstance();

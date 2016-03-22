@@ -49,6 +49,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class MyStocksActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+  private static final String KEY_TITLE = "STOCKHAWK_KEY_TITLE";
 
   /**
    * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -79,7 +80,6 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
     ((StockHawkApplication) getApplication()).getComponent().inject(this);
 
-
     mContext = this;
     ConnectivityManager cm =
         (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -91,17 +91,23 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     setContentView(R.layout.activity_my_stocks);
     ButterKnife.bind(this);
 
-    // The intent service is for executing immediate pulls from the Yahoo API
-    // GCMTaskService can only schedule tasks, they cannot execute immediately
-    mServiceIntent = new Intent(this, StockIntentService.class);
-    if (savedInstanceState == null){
+    if (savedInstanceState == null) {
+      // The intent service is for executing immediate pulls from the Yahoo API
+      // GCMTaskService can only schedule tasks, they cannot execute immediately
+      mServiceIntent = new Intent(this, StockIntentService.class);
+
       // Run the initialize task service so that some stocks appear upon an empty database
       mServiceIntent.putExtra("tag", "init");
-      if (isConnected){
+      if (isConnected) {
         startService(mServiceIntent);
-      } else{
+      } else {
         onServerDownEvent(new ServerDownEvent());
       }
+
+      mTitle = getTitle();
+    }
+    else {
+      mTitle = savedInstanceState.getCharSequence(KEY_TITLE);
     }
     mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
     getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
@@ -111,8 +117,8 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
             new RecyclerViewItemClickListener.OnItemClickListener() {
               @Override
               public void onItemClick(View v, int position) {
-                //TODO:
-                mCursor.moveToPosition(position);   // move to correct row in database
+                // move to correct row in database
+                mCursor.moveToPosition(position);
                 String symbol = mCursor.getString(mCursor.getColumnIndex("symbol"));
                 Log.d("MainActivity", "Clicked on " + symbol);
 
@@ -167,7 +173,6 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     mItemTouchHelper = new ItemTouchHelper(callback);
     mItemTouchHelper.attachToRecyclerView(mRecyclerView);
 
-    mTitle = getTitle();
     if (isConnected){
       long period = 3600L;
       long flex = 10L;
@@ -244,6 +249,11 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         mServerDownText.setVisibility(View.VISIBLE);
       }
     });
+  }
+
+  @Override
+  public void onSaveInstanceState(Bundle savedInstanceState) {
+    savedInstanceState.putCharSequence(KEY_TITLE, mTitle);
   }
 
   @Override

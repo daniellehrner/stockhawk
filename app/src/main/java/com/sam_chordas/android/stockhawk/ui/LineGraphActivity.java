@@ -204,64 +204,12 @@ public class LineGraphActivity extends AppCompatActivity {
 
         mGraphValues = new float[dataSize];
         mGraphLabels = new String[dataSize];
-        String[] formatedDates = new String[dataSize];
 
-        switch (getSelectedTimeFrame()) {
-            case WEEK:
-                for (int i = 0; i < dataSize; ++i) {
-                    try {
-                        mGraphLabels[i] = data.getLabel(i);
-                        formatedDates[i] = Utils.convertDateToWeekday(mGraphLabels[i], this);
-                        Log.d(LOG_TAG, "formatedDate:" + formatedDates[i]);
-                    }
-                    catch (NullPointerException e) {
-                        Log.e(LOG_TAG, "data.getLabel(" + i + ") is null:" + e.toString());
-                    }
-                    mGraphValues[i] = data.getValue(i);
-                }
+        LineSet formatedData = getFormatedLabels(data, dataSize);
 
-                data = new LineSet(formatedDates, mGraphValues);
-                break;
-            case TWO_WEEKS:
-                for (int i = 0; i < dataSize; ++i) {
-                    mGraphLabels[i] = data.getLabel(i);
-
-                    if ((i % 3) == 0) {
-                        formatedDates[i] = mGraphLabels[i];
-                    }
-                    else if (i == dataSize - 1) {
-                        formatedDates[i] = Utils.convertDateToWeekday(mGraphLabels[i], this);
-                    }
-                    else {
-                        formatedDates[i] = "";
-                    }
-
-                    mGraphValues[i] = data.getValue(i);
-                }
-
-                data = new LineSet(formatedDates, mGraphValues);
-                break;
-            case MONTH:
-                for (int i = 0; i < dataSize; ++i) {
-                    mGraphLabels[i] = data.getLabel(i);
-
-                    if ((i % 5) == 0) {
-                        formatedDates[i] = mGraphLabels[i];
-                    }
-                    else if (i == dataSize - 1) {
-                        formatedDates[i] = Utils.convertDateToWeekday(mGraphLabels[i], this);
-                    }
-                    else {
-                        formatedDates[i] = "";
-                    }
-
-                    mGraphValues[i] = data.getValue(i);
-                }
-
-                data = new LineSet(formatedDates, mGraphValues);
-                break;
-            default:
-                Log.e(LOG_TAG, "Time frame is invalid");
+        if (formatedData == null) {
+            Log.e(LOG_TAG, "formated data is null");
+            return;
         }
 
         mLineChartView.setAxisColor(Color.WHITE)
@@ -271,17 +219,17 @@ public class LineGraphActivity extends AppCompatActivity {
         paint.setColor(Color.GRAY);
         mLineChartView.setGrid(ChartView.GridType.VERTICAL, 2, dataSize, paint);
 
-        data.setColor(Color.YELLOW)
+        formatedData.setColor(Color.YELLOW)
                 .setDotsRadius(Tools.fromDpToPx(4))
                 .setDotsStrokeThickness(Tools.fromDpToPx(3))
                 .setDotsStrokeColor(Color.YELLOW)
                 .setThickness(10);
 
         try {
-            mLineChartView.addData(data);
+            mLineChartView.addData(formatedData);
         }
         catch (IllegalArgumentException e) {
-            Log.e(LOG_TAG, "Can't add data: " + e.toString());
+            Log.e(LOG_TAG, "Can't add formatedData: " + e.toString());
             return;
         }
 
@@ -291,22 +239,20 @@ public class LineGraphActivity extends AppCompatActivity {
 
         StringBuilder descriptionBuilder = new StringBuilder();
 
-        Log.d(LOG_TAG, "data size: " + data.size());
-
         float minValue = Float.MAX_VALUE, maxValue = Float.MIN_VALUE, value;
 
-        for (int i = 0; i < data.size(); ++i) {
-            value = data.getValue(i);
+        for (int i = 0; i < dataSize; ++i) {
+            value = formatedData.getValue(i);
 
             minValue = min(minValue, value);
             maxValue = max(maxValue, value);
 
-            descriptionBuilder.append(data.getLabel(i))
+            descriptionBuilder.append(formatedData.getLabel(i))
                     .append(": ")
                     .append(value);
 
             // add coma for all, but the last entry
-            if (i < data.size() - 1) {
+            if (i < formatedData.size() - 1) {
                 descriptionBuilder.append(", ");
             }
         }
@@ -324,6 +270,67 @@ public class LineGraphActivity extends AppCompatActivity {
         mLineChartView.setVisibility(View.VISIBLE);
 
         mLineChartView.show(anim);
+    }
+
+    private LineSet getFormatedLabels(LineSet data, int dataSize) {
+        String[] formatedDates = new String[dataSize];
+
+        switch (getSelectedTimeFrame()) {
+            case WEEK:
+                for (int i = 0; i < dataSize; ++i) {
+                    try {
+                        mGraphLabels[i] = data.getLabel(i);
+                        formatedDates[i] = Utils.convertDateToWeekday(mGraphLabels[i], this);
+                        Log.d(LOG_TAG, "formatedDate:" + formatedDates[i]);
+                    }
+                    catch (NullPointerException e) {
+                        Log.e(LOG_TAG, "data.getLabel(" + i + ") is null:" + e.toString());
+                    }
+                    mGraphValues[i] = data.getValue(i);
+                }
+                break;
+            case TWO_WEEKS:
+                for (int i = 0; i < dataSize; ++i) {
+                    mGraphLabels[i] = data.getLabel(i);
+
+                    if (i == dataSize - 1) {
+                        formatedDates[i] = Utils.convertDateToWeekday(mGraphLabels[i], this);
+                    }
+
+                    else if (i == 0 || i == 4 || i == 7) {
+                        formatedDates[i] = mGraphLabels[i];
+                    }
+                    else {
+                        formatedDates[i] = "";
+                    }
+
+                    mGraphValues[i] = data.getValue(i);
+                }
+                break;
+            case MONTH:
+                for (int i = 0; i < dataSize; ++i) {
+                    mGraphLabels[i] = data.getLabel(i);
+
+                    if (i == dataSize - 1) {
+                        formatedDates[i] = Utils.convertDateToWeekday(mGraphLabels[i], this);
+                    }
+
+                    else if ((i % 5) == 0) {
+                        formatedDates[i] = mGraphLabels[i];
+                    }
+                    else {
+                        formatedDates[i] = "";
+                    }
+
+                    mGraphValues[i] = data.getValue(i);
+                }
+                break;
+            default:
+                Log.e(LOG_TAG, "Time frame is invalid");
+                return null;
+        }
+
+        return new LineSet(formatedDates, mGraphValues);
     }
 
     private TIME_FRAME getSelectedTimeFrame() {

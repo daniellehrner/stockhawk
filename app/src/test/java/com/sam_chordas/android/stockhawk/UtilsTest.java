@@ -35,6 +35,9 @@ public class UtilsTest {
 
         assertEquals(mContext.getString(R.string.thu_short),
                 Utils.convertDateToWeekday("1970-01-01", mContext));
+
+        assertEquals(mContext.getString(R.string.yesterday),
+                Utils.convertDateToWeekday(Utils.getCalculatedDate("yyyy-MM-dd", -1), mContext));
     }
 
     @Test
