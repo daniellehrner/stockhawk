@@ -11,7 +11,6 @@ import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.StockHawkApplication;
 import com.sam_chordas.android.stockhawk.dependencyInjection.TestingComponent;
 import com.sam_chordas.android.stockhawk.rest.HistoricalDataClient;
-import com.squareup.okhttp.Response;
 
 import org.junit.Before;
 import org.junit.Rule;
