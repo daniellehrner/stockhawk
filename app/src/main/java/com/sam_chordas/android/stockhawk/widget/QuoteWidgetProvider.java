@@ -6,4 +6,5 @@ import android.appwidget.AppWidgetProvider;
  * Created by Daniel Lehrner
  */
 public class QuoteWidgetProvider extends AppWidgetProvider {
+
 }
