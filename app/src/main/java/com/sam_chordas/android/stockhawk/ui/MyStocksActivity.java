@@ -1,6 +1,7 @@
 package com.sam_chordas.android.stockhawk.ui;
 
 import android.app.LoaderManager;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -279,13 +280,23 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
   @Override
   public Loader<Cursor> onCreateLoader(int id, Bundle args){
-    // This narrows the return to only the stocks that are most current.
+    if (!isConnected) {
+
+      // mark all content as not current
+      ContentValues contentValues = new ContentValues();
+      contentValues.put(QuoteColumns.ISCURRENT, 0);
+      mContext.getContentResolver().update(QuoteProvider.Quotes.CONTENT_URI,
+              contentValues,
+              null,
+              null);
+    }
+
     return new CursorLoader(this, QuoteProvider.Quotes.CONTENT_URI,
-        new String[]{ QuoteColumns._ID, QuoteColumns.SYMBOL, QuoteColumns.BIDPRICE,
-            QuoteColumns.PERCENT_CHANGE, QuoteColumns.CHANGE, QuoteColumns.ISUP},
-        QuoteColumns.ISCURRENT + " = ?",
-        new String[]{"1"},
-        null);
+            new String[]{ QuoteColumns._ID, QuoteColumns.SYMBOL, QuoteColumns.BIDPRICE,
+                    QuoteColumns.PERCENT_CHANGE, QuoteColumns.CHANGE, QuoteColumns.ISUP},
+            QuoteColumns.ISCURRENT + " = ?",
+            new String[]{"1"},
+            null);
   }
 
   @Override
