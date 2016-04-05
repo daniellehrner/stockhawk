@@ -163,6 +163,9 @@ public class StockTaskService extends GcmTaskService{
         Log.e(LOG_TAG, "Server is down");
         mBus.post(new ServerDownEvent());
       }
+      catch (NullPointerException e) {
+        Log.e(LOG_TAG, "Update failed: " + e.getMessage());
+      }
     }
 
     return result;
