@@ -152,17 +152,17 @@ public class Utils {
     return s.format(new Date(cal.getTimeInMillis()));
   }
 
-  public static int roundToNextTen(int v, boolean directionUp)
+  public static double roundToNextTen(double v, boolean directionUp)
           throws IllegalArgumentException {
     if (v < 0) {
       throw new IllegalArgumentException("value has to be greater or equal to zero");
     }
 
-    int moduloValue = v % 10;
+    double moduloValue = v % 10;
 
     if (moduloValue != 0){
       if (directionUp) {
-        int x = 10 - (moduloValue);
+        double x = 10 - (moduloValue);
         v += x;
       } else {
         v -= moduloValue;

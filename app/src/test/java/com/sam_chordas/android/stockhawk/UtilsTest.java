@@ -58,11 +58,13 @@ public class UtilsTest {
 
     @Test
     public void shouldRoundToNextTen() {
-        assertEquals(10, Utils.roundToNextTen(8, true));
-        assertEquals(0, Utils.roundToNextTen(8, false));
+        assertEquals(10.0, Utils.roundToNextTen(8, true));
+        assertEquals(0.0, Utils.roundToNextTen(8, false));
 
-        assertEquals(10, Utils.roundToNextTen(10, false));
-        assertEquals(10, Utils.roundToNextTen(10, true));
+        assertEquals(10.0, Utils.roundToNextTen(10, false));
+        assertEquals(10.0, Utils.roundToNextTen(10, true));
+
+        assertEquals(20.0, Utils.roundToNextTen(10.1, true));
     }
 
     @Test

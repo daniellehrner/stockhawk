@@ -259,8 +259,8 @@ public class LineGraphActivity extends AppCompatActivity {
 
         mLineChartView.setContentDescription(descriptionBuilder.toString());
 
-        int maxRoundUp = Utils.roundToNextTen((int) maxValue, true);
-        int minRoundDown = Utils.roundToNextTen((int) minValue, false);
+        int maxRoundUp = (int) Utils.roundToNextTen(maxValue, true);
+        int minRoundDown = (int) Utils.roundToNextTen(minValue, false);
 
         mLineChartView.setAxisBorderValues(minRoundDown,
                 maxRoundUp,
