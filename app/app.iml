@@ -138,8 +138,8 @@
     <orderEntry type="library" exported="" name="rxjava-1.1.0" level="project" />
     <orderEntry type="library" exported="" name="design-23.2.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-gcm-8.4.0" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="robolectric-utils-3.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="asm-analysis-5.0.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="robolectric-utils-3.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="vtd-xml-2.11" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.8.2" level="project" />
     <orderEntry type="library" exported="" name="schematic-0.6.3" level="project" />
