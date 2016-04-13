@@ -1,6 +1,6 @@
 # Stock Hawk 
 
-![Stockhawk video demonstration](https://github.com/daniellehrner/stockhawk/raw/master/video/stockhawk_video.gif)
+<img src="https://github.com/daniellehrner/stockhawk/raw/master/video/stockhawk_video.gif" width="240" height="427" alt="Stockhawk video demonstration" />
 
 Part of the Udacity Android Developer Nanodegree. The app was created by another student and is debugged and extended by me. The files added by me can be found under [this link](https://github.com/daniellehrner/stockhawk/search?utf8=%E2%9C%93&q=Created+by+Daniel+Lehrner&type=Code).
 
