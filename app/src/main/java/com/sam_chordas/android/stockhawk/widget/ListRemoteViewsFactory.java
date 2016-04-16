@@ -10,6 +10,7 @@ import android.widget.RemoteViewsService;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
+import com.sam_chordas.android.stockhawk.ui.LineGraphActivity;
 
 /**
  * Created by Daniel Lehrner
@@ -65,6 +66,10 @@ public class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFac
 
         remoteView.setTextViewText(R.id.stock_symbol, symbol);
         remoteView.setTextViewText(R.id.change, change);
+
+        Intent intent = new Intent();
+        intent.putExtra(LineGraphActivity.KEY_SYM, symbol);
+        remoteView.setOnClickFillInIntent(R.id.widget_list_item, intent);
 
         return remoteView;
     }

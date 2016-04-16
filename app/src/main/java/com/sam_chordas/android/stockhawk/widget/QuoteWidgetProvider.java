@@ -1,14 +1,18 @@
 package com.sam_chordas.android.stockhawk.widget;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.TaskStackBuilder;
 import android.widget.RemoteViews;
 
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.service.StockTaskService;
+import com.sam_chordas.android.stockhawk.ui.LineGraphActivity;
+import com.sam_chordas.android.stockhawk.ui.MyStocksActivity;
 
 /**
  * Created by Daniel Lehrner
@@ -23,7 +27,20 @@ public class QuoteWidgetProvider extends AppWidgetProvider {
             Intent remoteAdapterIntent = new Intent(context, QuoteWidgetRemoteViewsService.class);
 
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_collection);
+
+            // start Stock Hawk app when clicking on title of the widget
+            Intent myStockIntent = new Intent(context, MyStocksActivity.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, myStockIntent, 0);
+            views.setOnClickPendingIntent(R.id.widget, pendingIntent);
+
             views.setRemoteAdapter(R.id.widget_list, remoteAdapterIntent);
+
+            // prepare for click on stock item
+            Intent clickIntentTemplate = new Intent(context, LineGraphActivity.class);
+            PendingIntent clickPendingIntent = TaskStackBuilder.create(context)
+                    .addNextIntentWithParentStack(clickIntentTemplate)
+                    .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+            views.setPendingIntentTemplate(R.id.widget_list, clickPendingIntent);
 
             appWidgetManager.updateAppWidget(id, views);
         }
