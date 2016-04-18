@@ -7,7 +7,7 @@ Part of the Udacity Android Developer Nanodegree. The app was created by another
 ## Required extensions
 * Each stock quote on the main screen is clickable and leads to a new screen which graphs the stock’s value over time. :white_check_mark:
 * Stock Hawk does not crash when a user searches for a non-existent stock. :white_check_mark:
-* Stock Hawk Stocks can be displayed in a collection widget.
+* Stock Hawk Stocks can be displayed in a collection widget. :white_check_mark:
 * Stock Hawk app has content descriptions for all buttons. :white_check_mark:
 * Stock Hawk app supports layout mirroring using both the LTR attribute and the start/end tags. :white_check_mark:
 * Strings are all included in the strings.xml file and untranslatable strings have a translatable tag marked to false. :white_check_mark:
